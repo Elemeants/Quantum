@@ -1,0 +1,7 @@
+{
+    "QuantumPath": "C:/Users/Jdany/Desktop/Codes/Quantum/",
+    "version" : 1.0,
+    "Compilers":{
+        "c++": "./Compilers/MinGW/bin"
+    }
+}   
