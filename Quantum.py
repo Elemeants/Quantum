@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 import sys
 import os
+import subprocess
 from pathlib import Path
 from Modules.ColorLoger import Loger
 from Modules.FileController import FolderManager, FileManager, FileTemplates
 
-__VERSION__ = 1.1
+__VERSION__ = 1.2
+
+
+def isInsideArray(__ARRAY__: list, __STR__: str) -> bool:
+    for x in range(__ARRAY__.__len__()):
+        if __TYPE__ == __ARRAY__[x]:
+            return True
+    return False
+
 
 class Modules:
     __PATH__ = ""
@@ -19,6 +28,7 @@ class Modules:
     - clean <project> Deletes the data from a folder project
     - new <project>   Generates a new folder project
     - build           Builds a projects (you need to be inside the folder project)
+    - run             Runs the .exe of the project 
     - add             Adds a component class or library into the actual project
     - help            Shows this message
 
@@ -68,22 +78,77 @@ class Modules:
         Wrapper = FolderManager(Modules.__PATH__)
         if Wrapper.enterDirectory("scr"):
             Loger.Info("Compilando Proyecto")
-            os.system("g++ main.cpp -o main.exe")
+            try:
+                output = subprocess.check_output("g++ main.cpp -o main.exe", shell=True)
+                Loger.Ok("Proyecto compilado")
+                Loger.Info("Proyecto ejecutandose")
+                print("")
+                os.system("main.exe")
+                print("\n")
+                Loger.Ok("Ejecucion completada")
+            except:
+                Loger.Error("Error de compilacion")
+
+    @staticmethod
+    def run():
+        Wrapper = FolderManager(Modules.__PATH__)
+        if Wrapper.enterDirectory("scr"):
             if FileManager.fileExist("main.exe"):
-                 Loger.Info("Proyecto ejecutandose")
-                 print("")
-                 os.system("main.exe")
-                 print("\n")
-                 Loger.Ok("Ejecucion completada")
+                Loger.Info("Ejecutando proyecto")
+                print("")
+                os.system("main.exe")
+                print("\n")
+                Loger.Ok("Ejecucion completada")
             else:
-                Loger.Error("Error de compilacion main.cpp")
-            return True
+                Loger.Error("No se puede ejecutar el proyecto")
+
+    @staticmethod
+    def genFileLib(__NAME__: str, __IS_CLASS: bool) -> bool:
+        Wrapper = FolderManager(Modules.__PATH__)
+        if Wrapper.enterDirectory("lib"):
+            Wrapper.createfolder(__NAME__)
+            if Wrapper.enterDirectory(__NAME__):
+                FileManager.createFile("{0}.h".format(__NAME__),
+                                       FileTemplates.library_H(__NAME__, _mode=__IS_CLASS))
+                FileManager.createFile("{0}.cpp".format(__NAME__),
+                                       FileTemplates.library_C(__NAME__))
+                if FileManager.fileExist("{0}.h".format(__NAME__)) \
+                        and FileManager.fileExist("{0}.cpp".format(__NAME__)):
+                    Loger.Ok("Libreria creada")
+                    os.system("{0}.h".format(__NAME__))
+                    Wrapper.upFolder(2)
+                    Modules.addLibtoH(__NAME__)
+                    return True
         return False
 
     @staticmethod
-    def add(__TYPE__, __NAME__):
-        Loger.Ok("Iniciando ADD Module")
+    def addLibtoH(__NAME__):
+        Wrapper = FolderManager(Modules.__PATH__)
+        if Wrapper.enterDirectory("scr"):
+            if FileManager.fileExist("main.h"):
+                Manage = Path("main.h")
+                Text = Manage.read_text().replace("///---",
+                                                  """#include "..\lib\{0}\{0}.h"\n///---""".format(__NAME__))
+                try:
+                    FILE = open("main.h", "w")
+                    FILE.write(Text)
+                    Loger.Ok("Main.h actualizado")
+                except:
+                    Loger.Error("No se pudo actualizar main.h")
 
+    @staticmethod
+    def add(__TYPE__, __NAME__):
+        availableTypes = ["library", "class"]
+        if isInsideArray(availableTypes, __TYPE__):
+            if __TYPE__ == availableTypes[0]:
+                Loger.Info("Generando libreria")
+                Modules.genFileLib(__NAME__, False)
+            if __TYPE__ == availableTypes[1]:
+                Loger.Info("Generando clase")
+                Modules.genFileLib(__NAME__, True)
+
+        else:
+            Loger.Error("El componente no existe")
 
 os.system("@echo off")
 # print(Loger.CBLUE2 + sys.argv.__str__() + Loger.CEND)
@@ -128,8 +193,10 @@ if sys.argv.__len__() > 1:
             Loger.Error("Comando \"clean\" necesita el nombre del proyecto")
 
     if __COMMAND__ == "build":
-        if not Modules.build():
-            Loger.Error("No se pudo compilar el proyecto")
+        Modules.build()
+
+    if __COMMAND__ == "run":
+        Modules.run()
 
     if __COMMAND__ == "help":
         Modules.help()

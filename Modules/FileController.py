@@ -117,8 +117,27 @@ class FileTemplates:
                                                      __FILEH__="MAIN_H")
 
     @staticmethod
-    def library_H(_nameLibrary: str):
+    def library_H(_nameLibrary: str, _mode:bool ):
+        _string = Template("")
+        if _mode:
+            _string = Template("""// Object declaration
+class $__CLASS__
+{
+public:
+    $__CLASS__();
+private:
+
+protected:
+
+};
+
+$__CLASS__::$__CLASS__()
+{
+
+}
+""")
         return FileTemplates.LIBRARY_H.substitute(__CLASS__=_nameLibrary,
+                                                  __MODE__ = _string.substitute(__CLASS__=_nameLibrary),
                                                   __FILE__="{0}_H".format(_nameLibrary.upper()))
 
     @staticmethod
@@ -150,22 +169,9 @@ int main(void)
 #define $__FILE__
 // Libraries definitions
 
+$__MODE__
 
-// Object declaration
-class $__CLASS__
-{
-public:
-    $__CLASS__();
-private:
-
-protected:
-
-}
-
-$__CLASS__::$__CLASS__()
-{
-
-}
+#include "$__CLASS__.cpp"
 
 #endif // !$__FILE__
 """)
@@ -175,7 +181,7 @@ $__CLASS__::$__CLASS__()
     Object class: $__CLASS__
     Documentation: 
 */
-#include "$__CLASS__"
+#include "$__CLASS__.h"
 
 // Functions of the class
 
@@ -191,19 +197,10 @@ $__CLASS__::$__CLASS__()
 #ifndef $__FILEH__
 #define $__FILEH__
 
-/**
-    REGION COMPONENTS 
-*/
-/// ---
-
-/// ---
-/**
-    DO NOT WRITE BEFORE THIS, IS USED TO AUTO ADD NEW COMPONENTS
-    TO THE PROJECT
-*/
-
 #include <iostream>
 #include <stdio.h>
+///---
+/// Dont delete this
 
 #endif // !$__FILEH__
 """)
