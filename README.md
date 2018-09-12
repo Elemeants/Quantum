@@ -4,12 +4,8 @@ Quantum is a Python script for windows to generate, build and manage C++ Project
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
 * [Python](https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe) - To execute the file
 * [C++ Compiler](http://pumath.dl.osdn.jp/mingw/69774/gcc-c++-7.3.0-1-mingw32-bin.tar.xz) - MinGW toolchain
-```
 
 ### Installing
 
