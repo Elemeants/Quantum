@@ -1,4 +1,4 @@
-    @echo off
+@echo off
 
 echo ----------------------------------------------------------------------------------
 echo                            Installer QUANTUM Script
@@ -9,9 +9,11 @@ echo Adding %cd% to PATH
 call %cd%\Scripts\AddPath %cd%
 echo ----------------------------------------------------------------------------------
 echo Downloading C++ compiler
+cd %~dp0
+cd ..
 mkdir %cd%\Compilers\MinGW
 cd %cd%\Compilers\MinGW
-..\..\Scripts\Curl\bin\curl.exe http://pumath.dl.osdn.jp/mingw/69774/gcc-c++-7.3.0-1-mingw32-bin.tar.xz -o MinGW.tar.xz
+REM ..\..\Scripts\Curl\bin\curl.exe http://pumath.dl.osdn.jp/mingw/69774/gcc-c++-7.3.0-1-mingw32-bin.tar.xz -o MinGW.tar.xz
 echo ----------------------------------------------------------------------------------
 echo Uncompressing C++ compiler
 ..\..\Scripts\7z\7za.exe x MinGW.tar.xz
@@ -21,14 +23,18 @@ del MinGW.tar
 echo ----------------------------------------------------------------------------------
 echo Adding C++ Compiler in %cd% to PATH
 cd %~dp0
+cd ..
 call %cd%\Scripts\AddPath %cd%\Compilers\MinGW\bin
 echo ----------------------------------------------------------------------------------
 cd %~dp0
+cd ..
 cd Compilers
-mkdir Python36_64
-..\..\Scripts\Curl\bin\curl.exe http://pumath.dl.osdn.jp/mingw/69774/gcc-c++-7.3.0-1-mingw32-bin.tar.xz -o MinGW.tar.xz
-https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe
-
+mkdir Python
+cd Python
+echo Descargando Python
+REM ..\..\Scripts\Curl\bin\curl.exe https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe -o PythonInstaller.exe
+echo Instalando Python
+PythonInstaller.exe
+echo ----------------------------------------------------------------------------------
 echo                            Instalacion Finalizada
-
 PAUSE
