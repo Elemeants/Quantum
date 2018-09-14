@@ -18,6 +18,7 @@ def isInsideArray(__ARRAY__: list, __STR__: str) -> bool:
 
 class Modules:
     __PATH__ = ""
+    __BUILD_OPTIONS__ = ""
 
     @staticmethod
     def help():
@@ -40,13 +41,7 @@ class Modules:
         if Path(__PROJECTNAME__).exists():
             Loger.Warning("Limpiando proyecto: \"{0}\"".format(__PROJECTNAME__))
             try:
-                _index = 0
-                while FileManager.fileExist(__PROJECTNAME__):
-                    os.system("rd /S /Q {0}".format(__PROJECTNAME__))
-                    if(_index >= 3):
-                        Loger.Error("No se pudo eliminar el proyecto")
-                        return False
-                    _index += 1
+                output = subprocess.check_output("rd /S /Q {0}".format(__PROJECTNAME__), shell=True)
                 Loger.Ok("Limpieza terminada")
             except:
                 Loger.Error("No se pudo eliminar el proyecto")
@@ -74,12 +69,13 @@ class Modules:
         return False
 
     @staticmethod
-    def build():
+    def build(__BUILD_OPTIONS__: str):
         Wrapper = FolderManager(Modules.__PATH__)
         if Wrapper.enterDirectory("scr"):
             Loger.Info("Compilando Proyecto")
             try:
-                output = subprocess.check_output("g++ main.cpp -o main.exe", shell=True)
+                subprocess.check_output(
+                    "g++ main.cpp -o main.exe {0}".format(__BUILD_OPTIONS__), shell=True)
                 Loger.Ok("Proyecto compilado")
                 Loger.Info("Proyecto ejecutandose")
                 print("")
@@ -151,7 +147,6 @@ class Modules:
             Loger.Error("El componente no existe")
 
 os.system("@echo off")
-# print(Loger.CBLUE2 + sys.argv.__str__() + Loger.CEND)
 if sys.argv.__len__() > 1:
     Modules.__PATH__ = sys.argv[0]
     __COMMAND__ = sys.argv[1]
@@ -193,7 +188,11 @@ if sys.argv.__len__() > 1:
             Loger.Error("Comando \"clean\" necesita el nombre del proyecto")
 
     if __COMMAND__ == "build":
-        Modules.build()
+        try:
+            __OPTIONS__ = sys.argv[2]
+            Modules.build(__OPTIONS__)
+        except:
+            Modules.build("")
 
     if __COMMAND__ == "run":
         Modules.run()
